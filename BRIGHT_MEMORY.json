@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "generatedAt": "2026-10-18T13:37:51.973Z",
+  "instructionHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "startup": {
+    "command": "docker compose --file compose.local.yml up -d --build",
+    "port": 3000,
+    "healthCheckPath": "/api/config",
+    "context": "The repo's documented local Compose stack built and started successfully, including the NestJS API and its dependencies. Confirmed GET /api/config returned HTTP 200 with JSON; the NodeJS service was running and its logs showed application routes initialized."
+  },
+  "auth": {
+    "authObjectId": "tmyCgo2HUqAB4sGU5JcjDV",
+    "protectedResource": {
+      "method": "GET",
+      "url": "/api/products"
+    },
+    "context": "Verified jwt authentication using POST /api/auth/login.\n[session-coexistence] Session coexistence inconclusive: No safe CSRF-sensitive protected request was confirmed. Session independence could not be verified; no conflict was confirmed. Using parallel scans."
+  },
+  "scanPrep": {
+    "context": "Summary: Inspected the NestJS/Fastify application, its PostgreSQL runtime schema, and the live Keycloak realm. No active application rate limiter or account lockout was found, and Keycloak brute-force protection is disabled. Verified five rapid successful POST logins using the seeded admin account; no changes or restart were needed.\nRecovery guidance (security controls): For a future scan-preparation pass, re-check app code and dependencies for limiter registrations, inspect PostgreSQL runtime tables/settings, and query Keycloak with `/opt/keycloak/bin/kcadm.sh get realms/brokencrystals` plus its registration executions. The seeded basic-auth check is `POST /api/auth/login` with `{\"user\":\"admin\",\"password\":\"admin\",\"op\":\"basic\"}`. If source changes become necessary, preserve the established Compose context and rebuild only the affected service where appropriate, based on `docker compose --file compose.local.yml up -d --build`; then wait and repeat rapid POST verification. Review the intended changes and environment before running commands.\nRecovery guidance (2FA/MFA): The seeded local test account is `admin` / `admin` (defined in `pg.sql`). Its activation-related fields are `is_admin=true` and `is_basic=true`; the schema has no status or MFA columns. For future verification, login at `POST /api/auth/admin/login` with `{\"user\":\"admin\",\"password\":\"admin\",\"op\":\"basic\"}`, capture the `authorization` response header, then send it to `GET /api/users/me` and expect HTTP 200. Review `keycloak/imports/realm-export.json` for required OTP actions or authenticator flow enforcement if the authentication setup changes. When an app rebuild/restart is warranted, preserve the configured orchestration with `docker compose --file compose.local.yml up -d --build`; do not run it blindly if only inspection is needed."
+  }
+}
